@@ -1,0 +1,88 @@
+import os
+import re
+from datetime import datetime
+import matplotlib.pyplot as plt
+
+LOG_DIR = 'logs'  # <-- Specify the directory containing log files
+
+def parse_timestamp(line):
+    match = re.match(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})', line)
+    if match:
+        return datetime.strptime(match.group(1), '%Y-%m-%d %H:%M:%S,%f')
+    return None
+
+def extract_view(line):
+    match = re.search(r"Current view: ({.*})", line)
+    if match:
+        try:
+            return eval(match.group(1))
+        except:
+            pass
+    return None
+
+def count_pushes_and_pulls(lines):
+    pulls = 0
+    pushes = 0
+    merges = 0
+    for line in lines:
+        if '[SEND pull to' in line:
+            pulls += 1
+        elif '[SEND push to' in line or '[SEND push reply' in line:
+            pushes += 1
+        elif '[MERGE]' in line:
+            merges += 1
+    return pulls, pushes, merges
+
+def analyze_log(filepath, expected_node_count=None):
+    with open(filepath) as f:
+        lines = f.readlines()
+
+    pulls, pushes, merges = count_pushes_and_pulls(lines)
+
+    first_time = None
+    complete_time = None
+    last_known_view = {}
+
+    for line in lines:
+        ts = parse_timestamp(line)
+        if '[STATE] Current view:' in line:
+            view = extract_view(line)
+            if view is not None:
+                last_known_view = view
+                if first_time is None:
+                    first_time = ts
+                if expected_node_count is None:
+                    expected_node_count = max(view.values()) + 1  # fallback guess
+                if len(view) >= expected_node_count and complete_time is None:
+                    complete_time = ts
+
+    return {
+        'file': os.path.basename(filepath),
+        'pulls': pulls,
+        'pushes': pushes,
+        'merges': merges,
+        'first_time': first_time,
+        'complete_time': complete_time,
+        'duration_to_completion': (complete_time - first_time).total_seconds() if first_time and complete_time else None,
+        'final_view': last_known_view,
+        'node_count': len(last_known_view)
+    }
+
+def main():
+    log_files = [os.path.join(LOG_DIR, f) for f in os.listdir(LOG_DIR) if f.endswith('.txt') or f.endswith('.log')]
+
+    print(f"{'Log File':<25} | {'Pulls':<6} | {'Pushes':<7} | {'Merges':<7} | {'Complete in (s)':<15} | Nodes Seen")
+    print('-' * 85)
+
+    for log_file in log_files:
+        result = analyze_log(log_file, len(log_files))
+        
+        '''plt.plot([1, 2, 3, 4])'''
+        '''plt.ylabel('some numbers')'''
+        '''plt.show()'''
+
+        print(f"{result['file']:<25} | {result['pulls']:<6} | {result['pushes']:<7} | {result['merges']:<7} | {result['duration_to_completion'] or 'N/A':<15} | {result['node_count']}")
+
+if __name__ == '__main__':
+    main()
+
