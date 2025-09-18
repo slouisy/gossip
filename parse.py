@@ -104,7 +104,7 @@ def main():
     # Push to GitHub
     # -----------------------------
     github_username = "slouisy"
-    github_pat = "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"  # keep secret!
+    github_pat = "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"  # keep secret!
     repo_name = "gossip"
     repo_path = os.getcwd()
     remote_url_with_token = f"https://{github_username}:{github_pat}@github.com/{github_username}/{repo_name}.git"
