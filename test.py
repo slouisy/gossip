@@ -118,6 +118,11 @@ if __name__ == '__main__':
             distance_scale = float(sys.argv[3])
     if len(sys.argv) > 4:
             mobility = sys.argv[4]
+    
+    log_path = "logs"
+    if not os.path.exists(log_path):
+        os.makedirs(log_path)
+        print(f"Directory '{log_path}' created.")
 
     info(f"Creating {station_count} station(s) with mobility='{mobility}'\n")
     topology()
