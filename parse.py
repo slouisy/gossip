@@ -105,8 +105,8 @@ def main():
     # -----------------------------
     repo_path = os.getcwd()
     try:
-        subprocess.run(["git", "add", "bar_chart.png"], check=True, cwd=repo_path)
-        subprocess.run(["git", "commit", "-m", "Add/update bar_chart.png"], check=True, cwd=repo_path)
+        subprocess.run(["git", "add", chart_name], check=True, cwd=repo_path)
+        subprocess.run(["git", "commit", "-m", f"Add/update {chart_name}"], check=True, cwd=repo_path)
         subprocess.run(["git", "push"], check=True, cwd=repo_path)
         print(f"Successfully pushed {chart_name} to GitHub!")
     except subprocess.CalledProcessError as e:
