@@ -1,3 +1,4 @@
+import sys
 import os
 import re
 import random
@@ -104,7 +105,7 @@ def main():
     # Push to GitHub
     # -----------------------------
     github_username = "slouisy"
-    github_pat = "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"  # keep secret!
+    github_pat = sys.argv[1]
     repo_name = "gossip"
     repo_path = os.getcwd()
     remote_url_with_token = f"https://{github_username}:{github_pat}@github.com/{github_username}/{repo_name}.git"
