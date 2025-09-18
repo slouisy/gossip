@@ -103,15 +103,19 @@ def main():
     # -----------------------------
     # Push to GitHub
     # -----------------------------
+    github_username = "slouisy"
+    github_pat = "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"  # keep secret!
+    repo_name = "gossip"
     repo_path = os.getcwd()
+    remote_url_with_token = f"https://{github_username}:{github_pat}@github.com/{github_username}/{repo_name}.git"
+    subprocess.run(["git", "remote", "set-url", "origin", remote_url_with_token], cwd=repo_path, check=True)
     try:
         subprocess.run(["git", "add", chart_name], check=True, cwd=repo_path)
         subprocess.run(["git", "commit", "-m", f"Add/update {chart_name}"], check=True, cwd=repo_path)
         subprocess.run(["git", "push"], check=True, cwd=repo_path)
-        print(f"Successfully pushed {chart_name} to GitHub!")
+        print("Plot pushed to GitHub successfully!")
     except subprocess.CalledProcessError as e:
         print("Error during git operation:", e)
-    exit()
 
 if __name__ == '__main__':
     main()
